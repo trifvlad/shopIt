@@ -192,6 +192,7 @@ Router.post("/", (req, res) => {
     })
 });
 
+
 // update product by barcode
 Router.put("/:barcode", (req, res)=> {
     mySqlConnection.query("UPDATE product SET pname='" + req.body.name + "' WHERE barcode=" +req.params.barcode, (err) => {
