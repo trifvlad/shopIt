@@ -1,0 +1,12 @@
+Login screen - FrontEnd
+	     - BackEnd	
+
+RegisterScreen - " -
+
+Product Details Screen
+
+Shopping Cart ListView screen (List item should contain increase/decrese quantity buttons).
+
+Choose Store screen
+
+
