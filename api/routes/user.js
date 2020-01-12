@@ -47,7 +47,7 @@ Router.get("/:id", (req, res) => {
 });
 
 //login
-Router.post("/", (req, res) => {
+Router.post("/login/", (req, res) => {
     mySqlConnection.query("SELECT * from user WHERE uname='" + req.body.username + "' AND pwd='" + req.body.password + "'", (err, rows, fields) => {
         if(!err){
           if (rows.length === 1)
@@ -81,11 +81,11 @@ Router.post("/", (req, res) => {
 //     "type": 1,
 //     "email": "e-mail@shopit.com"
 // }
-Router.post("/", (req, res) => {
-    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"')", (err, result) => {
+Router.post("/register/", (req, res) => {
+    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`, `cardno`, `sid`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"', '" + 0 + "', " + req.body.sid + ")", (err, result) => {
+      console.log(req.body);
         if(!err){
             var insertId = result.insertId;
-
             res.send(
                 JSON.stringify({
                   status: 'ok',

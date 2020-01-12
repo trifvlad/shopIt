@@ -55,12 +55,14 @@ Router.get("/", (req, res) => {
 Router.post("/", (req, res) => {
     mySqlConnection.query("INSERT INTO `store` (`name`, `adress`) VALUES ('"+req.body.name+"', '"+req.body.address+"')", (err, result) => {
         if(!err){
-            var insertId = result.insertId;
+          console.log("result ");
+          console.log(result);
+            var sid = result.insertId;
 
             res.send(
                 JSON.stringify({
                   status: 'ok',
-                  data: '' + insertId
+                  data: '' + sid
                 })
               );
         }
