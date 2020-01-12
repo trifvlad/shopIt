@@ -3,8 +3,8 @@ const Router = express.Router();
 const mySqlConnection = require("../connection");
 
 //get product by barcode
-Router.get("/:barcode", (req, res) => {
-    mySqlConnection.query("SELECT * from product left join stock on stock.barcode = product.barcode WHERE product.barcode=" + req.params.barcode, (err, rows, fields) => {
+Router.get("/:barcode/:sid", (req, res) => {
+    mySqlConnection.query("SELECT * from product left join stock on stock.barcode = product.barcode AND stock.sid="+req.params.sid+" WHERE product.barcode=" + req.params.barcode, (err, rows, fields) => {
       console.log(rows);
         if(!err){
           if(rows.length !== 0) {
