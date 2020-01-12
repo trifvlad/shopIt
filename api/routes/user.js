@@ -6,10 +6,19 @@ const mySqlConnection = require("../connection");
 Router.get("/", (req, res) => {
     mySqlConnection.query("SELECT * from user", (err, rows, fields) => {
         if(!err){
-            res.send(rows);
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
         }
         else{
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -19,10 +28,19 @@ Router.get("/", (req, res) => {
 Router.get("/:id", (req, res) => {
     mySqlConnection.query("SELECT * from user WHERE uid=" + req.params.id, (err, rows, fields) => {
         if(!err){
-            res.send(rows);
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
         }
         else{
-            res.send("fail")
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -67,11 +85,21 @@ Router.post("/", (req, res) => {
     mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"')", (err, result) => {
         if(!err){
             var insertId = result.insertId;
-            res.send("" + insertId);
+
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: '' + insertId
+                })
+              );
         }
         else{
-            res.send("fail");
-            console.log(err.message);
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
@@ -80,11 +108,19 @@ Router.post("/", (req, res) => {
 Router.delete("/:id", (req, res) => {
     mySqlConnection.query("DELETE FROM `user` WHERE `user`.`uid`=" + req.params.id, (err) => {
         if(!err){
-            res.send("success");
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            console.log(err.message);
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });

@@ -5,10 +5,20 @@ const mySqlConnection = require("../connection");
 //get store by id
 Router.get("/:id", (req, res) => {
     mySqlConnection.query("SELECT * from store WHERE sid=" + req.params.id, (err, rows, fields) => {
-        if (!err){
-            res.send(rows);
-        } else {
-            res.send("fail")
+        if(!err){
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
+        }
+        else{
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -18,10 +28,19 @@ Router.get("/:id", (req, res) => {
 Router.get("/", (req, res) => {
     mySqlConnection.query("SELECT * from store", (err, rows, fields) => {
         if(!err){
-            res.send(rows);
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
         }
         else{
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -37,11 +56,21 @@ Router.post("/", (req, res) => {
     mySqlConnection.query("INSERT INTO `store` (`name`, `adress`) VALUES ('"+req.body.name+"', '"+req.body.address+"')", (err, result) => {
         if(!err){
             var insertId = result.insertId;
-            res.send("" + insertId);
+
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: '' + insertId
+                })
+              );
         }
         else{
-            res.send("fail");
-            console.log(err.message);
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
@@ -56,11 +85,19 @@ Router.post("/", (req, res) => {
 Router.put("/:id", (req, res)=> {
     mySqlConnection.query("UPDATE store SET name='" + req.body.name + "', adress='" + req.body.address + "', iban='" + req.body.iban + "' WHERE sid=" +req.params.id, (err) => {
         if(!err){
-            res.send("success");
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            console.log(err.message)
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
@@ -69,11 +106,19 @@ Router.put("/:id", (req, res)=> {
 Router.delete("/:id", (req, res) => {
     mySqlConnection.query("DELETE FROM `store` WHERE `store`.`sid`=" + req.params.id, (err) => {
         if(!err){
-            res.send("success");
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            console.log(err.message);
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });

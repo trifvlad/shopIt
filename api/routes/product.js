@@ -5,10 +5,20 @@ const mySqlConnection = require("../connection");
 //get product by barcode
 Router.get("/:barcode", (req, res) => {
     mySqlConnection.query("SELECT * from product WHERE barcode=" + req.params.barcode, (err, rows, fields) => {
-        if (!err){
-            res.send(rows);
-        } else {
-            res.send("fail")
+        if(!err){
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
+        }
+        else{
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -18,10 +28,19 @@ Router.get("/:barcode", (req, res) => {
 Router.get("/", (req, res) => {
     mySqlConnection.query("SELECT * from product", (err, rows, fields) => {
         if(!err){
-            res.send(rows);
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
         }
         else{
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
             console.log(err);
         }
     })
@@ -36,11 +55,19 @@ Router.get("/", (req, res) => {
 Router.post("/", (req, res) => {
     mySqlConnection.query("INSERT INTO `product` (`barcode`, `pname`) VALUES ('"+req.body.barcode+"', '"+req.body.name+"')", (err, result) => {
         if(!err){
-            res.send(req.body.barcode);
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            res.send("fail");
-            console.log(err.message);
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
@@ -49,11 +76,19 @@ Router.post("/", (req, res) => {
 Router.put("/:barcode", (req, res)=> {
     mySqlConnection.query("UPDATE product SET pname='" + req.body.name + "' WHERE barcode=" +req.params.barcode, (err) => {
         if(!err){
-            res.send("success");
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            console.log(err.message)
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
@@ -62,11 +97,19 @@ Router.put("/:barcode", (req, res)=> {
 Router.delete("/:barcode", (req, res) => {
     mySqlConnection.query("DELETE FROM `product` WHERE `product`.`barcode`=" + req.params.barcode, (err) => {
         if(!err){
-            res.send("success");
+            res.send(
+                JSON.stringify({
+                  status: 'ok'
+                })
+              );
         }
         else{
-            console.log(err.message);
-            res.send("fail");
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
         }
     })
 });
