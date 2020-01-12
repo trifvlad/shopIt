@@ -52,7 +52,9 @@ function insertStock(barcode,storeId, quantity, price,stockId = null, type ='ins
     }
     else if(type ==='update'){
         console.log("UPDATE");
-        mySqlConnection.query("UPDATE `stock` SET `price`="+price + "," + '`quantity`='+quantity
+        console.log("price: " + price);
+        console.log("quantity: " + quantity);
+        mySqlConnection.query("UPDATE `stock` SET `quantity`="+quantity + "," + '`price`='+price
         + ' WHERE `id` = '+stockId
         , (err, result) => {
             if(!err){
@@ -64,10 +66,11 @@ function insertStock(barcode,storeId, quantity, price,stockId = null, type ='ins
             }
         })
     }
-  
+
 }
 function addToStock(barcode, storeId,quantity,price)
 {
+  console.log("qt: " + quantity + " price: " + price)
     console.log("check if product exists in stock");
    return mySqlConnection.query("SELECT * from stock WHERE barcode=" + barcode + " AND sid=" + storeId, (err, rows, fields) => {
         if(!err){
@@ -88,6 +91,7 @@ function addToStock(barcode, storeId,quantity,price)
 }
 Router.post("/addProduct", (req, res) => {
     mySqlConnection.query("SELECT * from product WHERE barcode=" + req.body.barcode, (err, rows, fields) => {
+      console.log(req.body);
         if(!err){
             var barcode = req.body.barcode;
             if(rows.length === 0){
@@ -103,7 +107,7 @@ Router.post("/addProduct", (req, res) => {
                 }
             }
             console.log(req.body);
-            if(addToStock(barcode, req.body.sid,req.body.price,req.body.quantity)){
+            if(addToStock(barcode, req.body.sid,req.body.quantity,req.body.price)){
                 res.send(
                     JSON.stringify({
                         status: 'ok',
