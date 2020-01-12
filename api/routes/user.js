@@ -28,6 +28,31 @@ Router.get("/:id", (req, res) => {
     })
 });
 
+//login
+Router.post("/", (req, res) => {
+    mySqlConnection.query("SELECT * from user WHERE uname='" + req.body.username + "' AND pwd='" + req.body.password + "'", (err, rows, fields) => {
+        if(!err){
+          if (rows.length === 1)
+            res.send(
+              JSON.stringify({
+                status: 'ok',
+                data: rows[0]
+              })
+            );
+          else
+            res.send(
+              JSON.stringify({
+                status: 'fail'
+              })
+            );
+        }
+        else{
+            res.send("fail");
+            console.log(err.message);
+        }
+    })
+});
+
 // insert user into DB
 //example
 // {
