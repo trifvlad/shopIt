@@ -4,15 +4,25 @@ const mySqlConnection = require("../connection");
 
 //get product by barcode
 Router.get("/:barcode", (req, res) => {
-    mySqlConnection.query("SELECT 1 from product WHERE barcode=" + req.params.barcode, (err, rows, fields) => {
+    mySqlConnection.query("SELECT * from product WHERE barcode=" + req.params.barcode, (err, rows, fields) => {
       console.log(rows);
         if(!err){
+          if(rows.length !== 0) {
             res.send(
                 JSON.stringify({
-                  status: 'ok',
-                  data: rows
+                  status: 'exists',
+                  data: rows[0]
                 })
               );
+          }
+          else{
+              res.send(
+                  JSON.stringify({
+                    status: 'nonExistant'
+                  })
+                );
+              console.log(err);
+          }
         }
         else{
             res.send(
