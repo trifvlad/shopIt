@@ -125,4 +125,25 @@ Router.delete("/:id", (req, res) => {
     })
 });
 
+//get store by id
+Router.get("/getAllProducts/:id", (req, res) => {
+    mySqlConnection.query("SELECT * from stock left join product on stock.barcode=product.barcode WHERE stock.sid=" + req.params.id , (err, rows, fields) => {
+        if(!err){
+            res.send(
+                JSON.stringify({
+                  status: 'ok',
+                  data: rows
+                })
+              );
+        }
+        else{
+            res.send(
+                JSON.stringify({
+                  status: 'fail'
+                })
+              );
+            console.log(err);
+        }
+    })
+});
 module.exports = Router;
