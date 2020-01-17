@@ -91,6 +91,8 @@ export default class Client extends React.Component {
               this.state.allStores.map((store, index) => (
                 <ListItem
                   key={index}
+                  containerStyle={{justifyContent:'center'}}
+                  contentContainerStyle={{justifyContent:'center'}}
                   title={<Text style={{fontWeight: 'bold', fontSize:18}}>{store.name}</Text>}
                   subtitle={<Text>{store.adress}</Text>}
                   onPress={() => this.selectStore(store)}
