@@ -1,21 +1,19 @@
 import React from 'react';
-import { Text, View, ScrollView, Alert, Linking, KeyboardAvoidingView, Picker } from 'react-native';
-import { Header, Input, SearchBar, Button } from 'react-native-elements';
-import { Spinner, ListItem, Separator } from 'native-base';
-import IconF from 'react-native-vector-icons/FontAwesome';
-
-import { Font } from 'expo';
+import { View, Alert, KeyboardAvoidingView, Picker } from 'react-native';
+import { Header, Input, Button } from 'react-native-elements';
+import { Spinner } from 'native-base';
+import { api } from '../const.js';
 
 export default class Register extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      username : '',
-      email : '',
-      password : '',
+      username  : '',
+      email     : '',
+      password  : '',
       firstName : '',
-      lastName : '',
-      type : 'Client'
+      lastName  : '',
+      type      : 'Client'
     }
   }
   goBack() {
@@ -32,8 +30,8 @@ export default class Register extends React.Component {
   );
 
 
-  registerUser = (sid=null) => {
-     fetch('http://192.168.43.227:3000/user/register/', {
+  registerUser = (sid = null) => {
+     fetch(api.root + api.register, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -66,7 +64,7 @@ export default class Register extends React.Component {
   };
 
   registerStore = async() => {
-    await fetch('http://192.168.43.227:3000/store/', {
+    await fetch(api.root + api.store, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

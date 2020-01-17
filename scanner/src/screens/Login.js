@@ -1,17 +1,15 @@
 import React from 'react';
-import { Text, View, ScrollView, Alert, Linking } from 'react-native';
-import { Header, Input, SearchBar, Button } from 'react-native-elements';
-import { Spinner, ListItem, Separator } from 'native-base';
-import IconF from 'react-native-vector-icons/FontAwesome';
-
-import { Font } from 'expo';
+import { View } from 'react-native';
+import { Header, Input, Button } from 'react-native-elements';
+import { Spinner } from 'native-base';
+import { api } from '../const.js';
 
 export default class Login extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      username : 'admin',
-      password : 'admin'
+      username : 'client',
+      password : 'client'
     }
   }
 
@@ -20,10 +18,10 @@ export default class Login extends React.Component {
   }
 
   doLogin = () => {
-    fetch('http://192.168.43.227:3000/user/login/', {
+    fetch(api.root + api.login, {
         method: 'POST',
         headers: {
-          Accept: 'application/json',
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

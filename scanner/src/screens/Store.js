@@ -1,25 +1,26 @@
 import React from 'react';
-import { Text, View, ScrollView, Alert, Linking, Dimensions, FlatList } from 'react-native';
-import { Header, Input, SearchBar, Button, ListItem } from 'react-native-elements';
-import { Spinner, Separator } from 'native-base';
-import IconF from 'react-native-vector-icons/FontAwesome';
+import { Text, View, Alert, ScrollView, RefreshControl, Dimensions, TouchableOpacity } from 'react-native';
+import { Header, Input, Button, ListItem } from 'react-native-elements';
+import { Spinner, Picker } from 'native-base';
 import BarcodeScanner from './BarcodeScanner';
-import { Font } from 'expo';
 import { Overlay } from 'react-native-elements';
+import { api } from '../const';
 
 export default class Store extends React.Component {
   constructor(props){
     super(props);
     this.state = {
       authData : {},
-      barcode : '',
-      barcodeExists : false,
-      productName : '',
-      price : '',
-      quantity : '',
       loading: false,
+      refreshing : true,
+      price : '',
+      barcode : '',
+      quantity : '',
+      productName : '',
+      barcodeExists : false,
       cameraVisible : false,
       fillProductDetailsVisible : false,
+      editProductDetailsVisible : false,
       editStoreDetailsVisible : false,
       storeName    : '',
       storeAddress : '',
@@ -35,7 +36,7 @@ export default class Store extends React.Component {
 
   checkIfBarcodeExists(barcode) {
     const sid = this.props.navigation.getParam('auth').sid;
-    fetch('http://192.168.43.227:3000/product/' + barcode + '/' + sid, {
+    fetch(api.root + api.product + barcode + '/' + sid, {
         method: 'GET',
     })
     .then((response) => response.json())
@@ -63,10 +64,26 @@ export default class Store extends React.Component {
 
   }
 
+  logOut = () => {
+    this.props.navigation.navigate('Home');
+  }
+
   renderHeader = () => (
     <Header
       placement="center"
-      centerComponent={{ text: 'Welcome, ' + this.props.navigation.getParam('auth').fname, style: { color: '#fff', fontSize: 19 } }}
+      leftComponent={
+        <View style={{flexDirection : 'column', width : Math.round(Dimensions.get('window').width / 2)}}>
+          <Text style={{ color : '#fff', fontSize : 14 }}>{this.props.navigation.getParam('auth').fname}</Text>
+          <Text style={{ color : '#fff', fontSize : 14 }}>{this.state.storeName}</Text>
+        </View>
+      }
+      rightComponent={
+        <View style={{flexDirection : 'column', alignItems : 'flex-end' ,width : Math.round(Dimensions.get('window').width / 2)}}>
+          <TouchableOpacity onPress={this.logOut}>
+            <Text style={{color : 'white'}}>Log out</Text>
+          </TouchableOpacity>
+        </View>
+      }
       containerStyle={{ backgroundColor: '#2B2F33' }}
     />
   );
@@ -87,8 +104,8 @@ export default class Store extends React.Component {
     this.setState({cameraVisible:true})
   };
 
-  addProduct = () => {
-    fetch('http://192.168.43.227:3000/product/addProduct/', {
+  postProduct = () => {
+    fetch(api.root + api.addProduct, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -105,7 +122,6 @@ export default class Store extends React.Component {
     .then((response) => response.json())
     .then((responseJson) => {
       if (responseJson.status === 'ok'){
-        Alert.alert('Product added!');
         this.fetchStoreProducts();
       } else {
         Alert.alert('Something went wrong...');
@@ -148,10 +164,49 @@ export default class Store extends React.Component {
           value={this.state.quantity.toString()}
           onChangeText={(text) => this.setState({quantity : text})}
         />
-        <Button title="Add product" onPress={() => this.addProduct()} containerStyle={{marginTop : 10}}/>
+        <Button title="Add product" onPress={() => this.postProduct()} containerStyle={{marginTop : 10}}/>
       </View>
     </Overlay>
   );
+
+  renderEditProductForm = () => {
+    return (
+      <Overlay isVisible={this.state.editProductDetailsVisible} onBackdropPress={() => this.setState({editProductDetailsVisible : false})}>
+        <View style={{
+            marginTop : 100,
+            flexDirection : 'column'
+          }}>
+          <Input
+            label='Barcode'
+            placeholder={this.state.barcode}
+            editable={false}
+          />
+          <Input
+            label='Product Name'
+            placeholder={'...'}
+            value={this.state.productName}
+            editable={false}
+            onChangeText={(text) => this.setState({productName : text})}
+          />
+          <Input
+            label='Price/unit'
+            placeholder='...'
+            keyboardType={'numeric'}
+            value={this.state.price.toString()}
+            onChangeText={(text) => this.setState({price : text})}
+          />
+          <Input
+            label='Quantity'
+            placeholder='...'
+            keyboardType={'numeric'}
+            value={this.state.quantity.toString()}
+            onChangeText={(text) => this.setState({quantity : text})}
+          />
+          <Button title="Edit product" onPress={() => this.postProduct()} containerStyle={{marginTop : 10}}/>
+        </View>
+      </Overlay>
+    );
+  };
 
   renderEditStoreDetailsForm = () => {
     return (
@@ -187,7 +242,7 @@ export default class Store extends React.Component {
   fetchStoreDetails = () => {
     const sid = this.props.navigation.getParam('auth').sid;
     if (sid){
-      fetch('http://192.168.43.227:3000/store/' + sid, {
+      fetch(api.root + api.store + sid, {
         method: 'GET',
       })
       .then((response) => response.json())
@@ -212,7 +267,7 @@ export default class Store extends React.Component {
   fetchStoreProducts = () => {
     const sid = this.props.navigation.getParam('auth').sid;
     if (sid){
-      fetch('http://192.168.43.227:3000/store/getAllProducts/' + sid, {
+      fetch(api.root + api.getAllProducts + sid, {
         method: 'GET',
       })
       .then((response) => response.json())
@@ -220,6 +275,7 @@ export default class Store extends React.Component {
         if (responseJson.status === 'ok'){
           console.log(responseJson);
           this.setState({
+            refreshing : false,
             products : responseJson.data
           });
         } else {
@@ -234,7 +290,7 @@ export default class Store extends React.Component {
 
   updateStoreDetails = () => {
     const sid = this.props.navigation.getParam('auth').sid;
-    fetch('http://192.168.43.227:3000/store/' + sid, {
+    fetch(api.root + api.store + sid, {
         method: 'PUT',
         headers: {
           Accept: 'application/json',
@@ -261,8 +317,6 @@ export default class Store extends React.Component {
   }
 
   renderContent = () => {
-
-
     return (
       <View style={{
           margin : 10,
@@ -273,22 +327,29 @@ export default class Store extends React.Component {
         <Button title="Scan" containerStyle={{width : '45%'}} onPress={() => this.showScanner()}/>
         <Button title="Edit store details" containerStyle={{width : '45%'}} onPress={() => this.setState({editStoreDetailsVisible : true})}/>
         {this.renderAddProductForm()}
+        {this.renderEditProductForm()}
         {this.renderEditStoreDetailsForm()}
 
       </View>
     );
   }
 
-  renderRow ({ item }) {
-    return (
-      <ListItem
-        roundAvatar
-        title={item.name}
-        subtitle={item.subtitle}
-        avatar={{uri:item.avatar_url}}
-      />
-    )
-  }
+  editProduct = (product) => {
+    this.setState({
+      price : product.price,
+      barcode : product.barcode,
+      quantity : product.quantity,
+      productName : product.pname,
+      editProductDetailsVisible : true
+    });
+  };
+
+  _onRefresh = () => {
+    this.setState({
+      refreshing : true
+    });
+    this.fetchStoreProducts();
+  };
 
   render() {
     if (!this.props.navigation.getParam('auth').sid) {
@@ -306,13 +367,21 @@ export default class Store extends React.Component {
       <View style={{ flex: 1 }}>
         {this.renderHeader()}
         {this.renderContent()}
-        <View>
+        <ScrollView 
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
+        >
           {
             this.state.products.map((l, i) => (
               <ListItem
                 key={i}
                 title={<Text style={{fontWeight: 'bold', fontSize:18}}>{l.pname}</Text>}
                 subtitle={l.barcode}
+                onPress={() => this.editProduct(l)}
                 rightElement={
                   <View style={{
                       width: '25%',
@@ -328,7 +397,7 @@ export default class Store extends React.Component {
               />
             ))
           }
-        </View>
+        </ScrollView>
       </View>
     );
   }
