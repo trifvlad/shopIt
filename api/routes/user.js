@@ -82,7 +82,7 @@ Router.post("/login/", (req, res) => {
 //     "email": "e-mail@shopit.com"
 // }
 Router.post("/register/", (req, res) => {
-    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`, `cardno`, `sid`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"', '" + 0 + "', " + req.body.sid + ")", (err, result) => {
+    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`, `sid`, `balance`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"', '" + "', " + req.body.sid + ", "+ 0 +")", (err, result) => {
       console.log(req.body);
         if(!err){
             var insertId = result.insertId;
@@ -124,5 +124,161 @@ Router.delete("/:id", (req, res) => {
         }
     })
 });
+
+Router.put("/topup/:id", (req, res) => {
+  let balance = 0;
+  mySqlConnection.query("SELECT balance FROM user WHERE uid="+req.params.id, (err, rows, fields) => {
+    if(err){
+        res.send(
+          JSON.stringify({
+            status: 'fail'
+          })
+        );
+        console.log(err.message)
+      }
+      else{
+        console.log(rows[0]);
+        console.log(req.body.balance);
+        balance = rows[0].balance + req.body.balance;
+        console.log(balance);
+        mySqlConnection.query("update user set balance=" + balance + " WHERE uid=" + req.params.id, (err,rows, fields) => {
+          console.log("im here");
+          if(!err){
+            res.send(
+              JSON.stringify({
+                status: 'ok'
+              })
+            );
+          }
+          else{
+            res.send(
+              JSON.stringify({
+                status: 'fail'
+              })
+            );
+            console.log(err.message)
+          }
+        });
+      }
+  });
+});
+
+function updateUserBalance(uid, balance) {
+  mySqlConnection.query("update user set balance=" + balance + " WHERE uid=" + uid, (err,rows, fields) => {
+    console.log("update Urer Balance");
+    if(!err){
+      return true;
+    }
+    else{
+      console.log(err.message)
+      return false;
+    }
+  });
+}
+
+function updateStockForStore(sid, cartElem) {
+  mySqlConnection.query("update stock set quantity=" + cartElem.quantity + " WHERE sid=" + sid + " AND barcode=" + cartElem.barcode, (err,rows, fields) => {
+    console.log("updateStock from Store");
+    if(!err){
+      return true;
+    }
+    else{
+      console.log(err.message)
+      return false;
+    }
+  });
+}
+
+Router.put("/checkout", (req, res) => {
+  let sid = req.body.sid;
+  let uid = req.body.uid;
+  let cart = req.body.cart;
+  mySqlConnection.query("SELECT balance FROM user WHERE uid="+uid, (err, rows, fields) => {
+    if(err){
+        res.send(
+          JSON.stringify({
+            status: 'fail, nu poate lua balansul din user'
+          })
+        );
+        console.log(err.message)
+      }
+      else{
+        balance = rows[0].balance
+        console.log(balance + " balansul de pe server");
+        
+        let sumOfAllProducts = 0;
+        let cevanuebine = false;
+
+        mySqlConnection.query("select * from stock WHERE sid=" + sid, (err,rows, fields) => {
+          console.log("am ajuns in stock cu storul sid");
+          if(!err){
+            let stocks = rows;
+            console.log(stocks);
+            console.log(cart);
+            cart.forEach(cartElem => {
+              let cartElemExists = 0;
+              stocks.forEach(stock => {
+                if (stock.barcode == cartElem.barcode) {
+                  cartElemExists = stock.barcode;
+                  if (stock.quantity >= cartElem.quantity) {
+                    sumOfAllProducts = sumOfAllProducts + cartElem.quantity * stock.price;
+                    cartElem.quantity = stock.quantity - cartElem.quantity;
+                  }
+                  else{
+                    
+                    res.send(
+                      JSON.stringify({
+                        status: 'fail, stock not available'
+                      })
+                    );
+                    cevanuebine = true;
+                  }
+                }
+              });
+              if (cartElemExists === 0) {
+                res.send(
+                  JSON.stringify({
+                    status: 'fail, barcode not found' + cartElemExists
+                  })
+                );
+                cevanuebine = true;
+              }
+            });
+            if (cevanuebine === false) {
+              if (sumOfAllProducts <= balance) {
+                updateUserBalance(uid, balance - sumOfAllProducts);
+                console.log(cart);
+                cart.forEach(cartElem => {
+                  updateStockForStore(sid, cartElem);
+                });
+                res.send(
+                  JSON.stringify({
+                    status: 'ok'
+                  })
+                );
+              }
+              else {
+                res.send(
+                  JSON.stringify({
+                    status: 'fail, put more money in your balance dude'
+                  })
+                );
+                cevanuebine = true;
+              }
+            }
+          }
+          else{
+            res.send(
+              JSON.stringify({
+                status: 'fail, did not get the stocks with the store id'
+              })
+            );
+            console.log(err.message)
+          }
+        });
+      }
+  });
+})
+
 
 module.exports = Router;
