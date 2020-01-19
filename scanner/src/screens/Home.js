@@ -1,10 +1,8 @@
 import React from 'react';
-import { Text, View, ScrollView, Alert, Linking, Dimensions } from 'react-native';
+import { Text, View, Image, Alert, Linking, Dimensions } from 'react-native';
 import { Header, Input, SearchBar, Button } from 'react-native-elements';
 import { Spinner, ListItem, Separator } from 'native-base';
-import IconF from 'react-native-vector-icons/FontAwesome';
-
-import { Font } from 'expo';
+import logo from '../../assets/logo.jpeg';
 
 export default class Home extends React.Component {
   constructor(props){
@@ -25,7 +23,7 @@ export default class Home extends React.Component {
   renderHeader = () => (
     <Header
       placement="center"
-      centerComponent={{ text: 'Welcome to ShopIt', style: { color: '#fff', fontSize: 19 } }}
+      centerComponent={{ text: 'Welcome to ShopIt', style: { color: '#fff', fontSize: 19 }}}
       containerStyle={{ backgroundColor: '#2B2F33' }}
     />
   );
@@ -33,16 +31,19 @@ export default class Home extends React.Component {
   renderContent = () => (
     <View style={{
         margin : 10,
-        marginTop : Math.round(Dimensions.get('window').height) - 150,
-        flexDirection : 'row',
-        justifyContent : 'space-between'
+        flexDirection : 'column'
       }}>
-      <Button
-        title="Log in"
-        containerStyle={{width : '45%'}}
-        onPress={() => this.goToLogin()}
-      />
-    <Button title="Register" containerStyle={{width : '45%'}} onPress={() => this.goToRegister()}/>
+        <Image source={logo} style={{
+          width : logo.width
+        }} />
+        <View style={{
+          flexDirection : 'row',
+          justifyContent : 'space-between',
+          marginTop : Math.round(Dimensions.get('window').height/3.3)
+        }}>
+          <Button title="Log in" containerStyle={{width : '45%'}} onPress={() => this.goToLogin()}/>
+          <Button title="Register" containerStyle={{width : '45%'}} onPress={() => this.goToRegister()}/>
+        </View>
     </View>
   );
 
@@ -50,7 +51,7 @@ export default class Home extends React.Component {
     if (true) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Spinner color="green" />
+          <Spinner color="green" />
         </View>
       );
     }

@@ -6,4 +6,7 @@ export const api = {
   product    : 'product/',
   addProduct : 'product/addProduct/',
   getAllProducts : 'store/getAllProducts/',
+  topUp      : 'user/topup',
+  checkout   : 'user/checkout',
+  checkProductForClient : 'product/checkProductForClient/'
 };

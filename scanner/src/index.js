@@ -6,6 +6,7 @@ import Register from './screens/Register';
 import Store from './screens/Store';
 import Client from './screens/Client';
 import BarcodeScanner from './screens/BarcodeScanner';
+import TopUp from './screens/TopUp';
 
 export default class Index extends Component {
   render() {
@@ -22,6 +23,7 @@ const AppSwitchNavigator = createSwitchNavigator({
   Store: { screen: Store},
   Client: { screen: Client },
   BarcodeScanner: { screen: BarcodeScanner },
+  TopUp: { screen : TopUp }
 });
 
 const AppContainer = createAppContainer(AppSwitchNavigator);

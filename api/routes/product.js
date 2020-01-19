@@ -4,7 +4,8 @@ const mySqlConnection = require("../connection");
 
 //get product by barcode
 Router.get("/:barcode/:sid", (req, res) => {
-    mySqlConnection.query("SELECT * from product left join stock on stock.barcode = product.barcode AND stock.sid="+req.params.sid+" WHERE product.barcode=" + req.params.barcode, (err, rows, fields) => {
+    console.log('request: ', req.body);
+    mySqlConnection.query("SELECT product.barcode, product.pname, stock.id, stock.sid, stock.quantity, stock.price from product left join stock on stock.barcode = product.barcode AND stock.sid="+req.params.sid+" WHERE product.barcode=" + req.params.barcode, (err, rows, fields) => {
       console.log(rows);
         if(!err){
           if(rows.length !== 0) {
@@ -34,6 +35,36 @@ Router.get("/:barcode/:sid", (req, res) => {
         }
     })
 });
+
+//check if product exists
+Router.get("/checkProductForClient/:barcode/:sid", (req, res) => {
+  console.log('x');
+  mySqlConnection.query("SELECT * FROM stock WHERE barcode=" + req.params.barcode + " AND sid=" + req.params.sid, (err, rowsStock, fields) => {  
+      if(!err){
+        console.log(rowsStock);
+        if (rowsStock.length > 0) {
+          mySqlConnection.query("SELECT * FROM product WHERE barcode=" + req.params.barcode, (err, rowsProduct, fields) => {
+            if (!err) {
+              res.send(JSON.stringify({ 
+                status : 'exists', 
+                data : {
+                  ...rowsStock[0],
+                  pname : rowsProduct[0].pname
+                }
+              }))
+            } else console.log(err);
+          });
+        } else {
+          res.send(JSON.stringify({ status : 'nonExistant' }));
+        }
+      }
+      else{
+        res.send(JSON.stringify({status : 'fail'}));
+        console.log(err);
+      }
+  });
+});
+
 function insertStock(barcode,storeId, quantity, price,stockId = null, type ='insert')
 {
     if(type === 'insert')

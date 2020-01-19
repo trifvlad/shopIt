@@ -36,7 +36,9 @@ export default class Store extends React.Component {
 
   checkIfBarcodeExists(barcode) {
     const sid = this.props.navigation.getParam('auth').sid;
-    fetch(api.root + api.product + barcode + '/' + sid, {
+    const url = api.root + api.product + barcode + '/' + sid;
+    console.log(url);
+    fetch(url, {
         method: 'GET',
     })
     .then((response) => response.json())
@@ -46,8 +48,8 @@ export default class Store extends React.Component {
         this.setState({
           barcodeExists : true,
           productName : responseJson.data.pname,
-          quantity : responseJson.data.quantity,
-          price : responseJson.data.price
+          quantity : responseJson.data.quantity ? responseJson.data.quantity : '',
+          price : responseJson.data.price ? responseJson.data.price : ''
         });
       } else if (responseJson.status === 'nonExistant'){
         this.setState({
