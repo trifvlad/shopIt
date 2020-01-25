@@ -1,5 +1,5 @@
 export const api = {
-  root       : 'http://192.168.0.100:3000/',
+  root       : 'http://192.168.43.227:3000/',
   login      : 'user/login/',
   register   : 'user/register/',
   store      : 'store/',

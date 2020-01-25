@@ -82,7 +82,7 @@ Router.post("/login/", (req, res) => {
 //     "email": "e-mail@shopit.com"
 // }
 Router.post("/register/", (req, res) => {
-    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`, `sid`, `balance`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"', '" + "', " + req.body.sid + ", "+ 0 +")", (err, result) => {
+    mySqlConnection.query("INSERT INTO `user` (`uname`, `pwd`, `fname`, `lname`, `type`, `email`, `sid`, `cardno`, `balance`) VALUES ('"+req.body.uname+"', '"+req.body.password+"', '"+req.body.fname+"', '"+req.body.lname+"', "+req.body.type+", '"+req.body.email+"', " + req.body.sid + " ," + 0 + ", "+ 0 +")", (err, result) => {
       console.log(req.body);
         if(!err){
             var insertId = result.insertId;

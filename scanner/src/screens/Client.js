@@ -196,7 +196,7 @@ export default class Client extends React.Component {
         if (responseJson.status === 'exists'){
           this.addToCart(responseJson.data);
         } else if (responseJson.status === 'nonExistant'){
-          Alert.alert('This product does not exist in the current store. Please contact the manager.')
+          Alert.alert('This product does not exist in the current store.')
         } else {
           Alert.alert('Something went wrong...');
         }
@@ -332,11 +332,13 @@ export default class Client extends React.Component {
 
   processCheckout = () => {
     let products = [];
+    let sum = 0;
     this.state.shoppingCartItems.map((p, i) => {
       products.push({
         barcode  : p.barcode,
         quantity : p.quantity
       });
+      sum += parseInt(p.quantity, 10) * parseInt(p.price, 10);
     });
     let payload = {
       sid : this.state.selectedStore.sid,
@@ -358,7 +360,10 @@ export default class Client extends React.Component {
         this.refreshUserData();
         this.setState({ paymentDoneVisible : true });
       } else {
-        Alert.alert('Something went wrong...');
+        if (this.state.authData.balance < sum)
+          Alert.alert('Insufficient funds. Please top up.');
+        else
+          Alert.alert('Something went wrong...');
       }
     })
     .catch((error) => {
